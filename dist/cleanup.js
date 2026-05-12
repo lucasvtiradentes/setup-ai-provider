@@ -19817,7 +19817,7 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
   }
 });
 
-// src/action/cleanup.ts
+// src/cleanup.ts
 var core5 = __toESM(require_core());
 
 // src/providers/claude.ts
@@ -20001,7 +20001,8 @@ async function cleanupProviderAuth() {
   }
 }
 
-// src/action/cleanup.ts
+// src/cleanup.ts
+void runCleanup();
 async function runCleanup() {
   try {
     await cleanupProviderAuth();
@@ -20009,9 +20010,6 @@ async function runCleanup() {
     core5.warning(error instanceof Error ? error.message : String(error));
   }
 }
-
-// src/cleanup.ts
-void runCleanup();
 /*! Bundled license information:
 
 undici/lib/fetch/body.js:

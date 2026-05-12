@@ -1,4 +1,4 @@
-import type { ActionInputs } from '../../action/inputs'
+import type { ActionInputs } from '../../inputs'
 import { getProvider, getProviders } from './registry'
 
 export async function setupProviderAuth(inputs: ActionInputs): Promise<void> {

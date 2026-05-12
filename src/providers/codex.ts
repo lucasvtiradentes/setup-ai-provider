@@ -2,7 +2,7 @@ import { mkdir } from 'node:fs/promises'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 import * as core from '@actions/core'
-import type { ActionInputs } from '../action/inputs'
+import type { ActionInputs } from '../inputs'
 import { type AiProvider, ProviderName } from './shared/types'
 import { installNpmPackage, maskJsonSecrets, removeStatePath, writeSecretFile } from './shared/utils'
 

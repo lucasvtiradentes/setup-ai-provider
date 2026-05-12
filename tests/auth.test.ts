@@ -2,7 +2,7 @@ import { mkdir, mkdtemp, readFile, stat, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
-import type { ActionInputs } from '../src/action/inputs'
+import type { ActionInputs } from '../src/inputs'
 import { setupProviderAuth } from '../src/providers/shared/auth'
 import { ProviderName } from '../src/providers/shared/types'
 

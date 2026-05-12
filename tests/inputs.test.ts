@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest'
-import { readInputs } from '../src/action/inputs'
+import { readInputs } from '../src/inputs'
 
 const originalEnv = { ...process.env }
 

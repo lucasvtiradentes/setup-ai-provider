@@ -69204,7 +69204,7 @@ var require_light = __commonJS({
   }
 });
 
-// src/action/run.ts
+// src/index.ts
 var core7 = __toESM(require_core());
 
 // node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/external.js
@@ -83721,9 +83721,8 @@ function date4(params) {
 // node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/external.js
 config(en_default());
 
-// src/providers/claude.ts
+// src/inputs.ts
 var core = __toESM(require_core());
-var exec = __toESM(require_exec());
 
 // src/providers/shared/types.ts
 var ProviderName = /* @__PURE__ */ ((ProviderName2) => {
@@ -83733,7 +83732,42 @@ var ProviderName = /* @__PURE__ */ ((ProviderName2) => {
   return ProviderName2;
 })(ProviderName || {});
 
+// src/inputs.ts
+var booleanSchema = external_exports.string().trim().toLowerCase().refine((value) => ["true", "false", "1", "0", "yes", "no"].includes(value), {
+  message: "Expected a boolean value"
+}).transform((value) => value === "true" || value === "1" || value === "yes");
+var inputsSchema = external_exports.object({
+  artifactName: external_exports.string(),
+  claudeCodeOauthToken: external_exports.string(),
+  codexAuthJson: external_exports.string(),
+  collectSessionFiles: booleanSchema,
+  exportEnv: booleanSchema,
+  geminiCredentials: external_exports.string(),
+  installCli: booleanSchema,
+  provider: external_exports.enum(ProviderName),
+  retentionDays: external_exports.coerce.number().int().min(1).max(90),
+  sessionFilesPath: external_exports.string().min(1),
+  uploadSessionFiles: booleanSchema
+});
+function readInputs() {
+  return inputsSchema.parse({
+    artifactName: core.getInput("artifact-name"),
+    claudeCodeOauthToken: core.getInput("claude-code-oauth-token"),
+    codexAuthJson: core.getInput("codex-auth-json"),
+    collectSessionFiles: core.getInput("collect-session-files") || "false",
+    exportEnv: core.getInput("export-env") || "true",
+    geminiCredentials: core.getInput("gemini-credentials"),
+    installCli: core.getInput("install-cli") || "true",
+    provider: core.getInput("provider"),
+    retentionDays: core.getInput("retention-days") || "7",
+    sessionFilesPath: core.getInput("session-files-path") || "provider-session-files",
+    uploadSessionFiles: core.getInput("upload-session-files") || "false"
+  });
+}
+
 // src/providers/claude.ts
+var core2 = __toESM(require_core());
+var exec = __toESM(require_exec());
 var ClaudeProvider = class {
   command = "claude";
   name = "claude" /* Claude */;
@@ -83745,9 +83779,9 @@ var ClaudeProvider = class {
     if (!inputs.claudeCodeOauthToken) {
       return;
     }
-    core.setSecret(inputs.claudeCodeOauthToken);
+    core2.setSecret(inputs.claudeCodeOauthToken);
     if (inputs.exportEnv) {
-      core.exportVariable("CLAUDE_CODE_OAUTH_TOKEN", inputs.claudeCodeOauthToken);
+      core2.exportVariable("CLAUDE_CODE_OAUTH_TOKEN", inputs.claudeCodeOauthToken);
     }
   }
   async cleanupAuth() {
@@ -83758,11 +83792,11 @@ var ClaudeProvider = class {
 var import_promises2 = require("fs/promises");
 var import_node_os = require("os");
 var import_node_path = require("path");
-var core3 = __toESM(require_core());
+var core4 = __toESM(require_core());
 
 // src/providers/shared/utils.ts
 var import_promises = require("fs/promises");
-var core2 = __toESM(require_core());
+var core3 = __toESM(require_core());
 var exec3 = __toESM(require_exec());
 async function installNpmPackage(packageName) {
   await exec3.exec("npm", ["install", "--global", packageName]);
@@ -83772,7 +83806,7 @@ async function writeSecretFile(path4, content) {
   await (0, import_promises.chmod)(path4, 384);
 }
 async function removeStatePath(name) {
-  const path4 = core2.getState(name);
+  const path4 = core3.getState(name);
   if (!path4) {
     return;
   }
@@ -83793,7 +83827,7 @@ function readObject(value) {
   return value;
 }
 function maskJsonSecrets(content) {
-  core2.setSecret(content);
+  core3.setSecret(content);
   try {
     maskJsonValue(JSON.parse(content));
   } catch {
@@ -83815,7 +83849,7 @@ function maskJsonValue(value) {
   }
   for (const [key, item] of Object.entries(value)) {
     if (typeof item === "string" && isSecretKey(key)) {
-      core2.setSecret(item);
+      core3.setSecret(item);
     }
     maskJsonValue(item);
   }
@@ -83842,7 +83876,7 @@ var CodexProvider = class {
     const authPath = (0, import_node_path.join)(codexDir, "auth.json");
     await (0, import_promises2.mkdir)(codexDir, { recursive: true });
     await writeSecretFile(authPath, inputs.codexAuthJson);
-    core3.saveState("codex-auth-path", authPath);
+    core4.saveState("codex-auth-path", authPath);
   }
   async cleanupAuth() {
     await removeStatePath("codex-auth-path");
@@ -83853,7 +83887,7 @@ var CodexProvider = class {
 var import_promises3 = require("fs/promises");
 var import_node_os2 = require("os");
 var import_node_path2 = require("path");
-var core4 = __toESM(require_core());
+var core5 = __toESM(require_core());
 var GeminiProvider = class {
   command = "gemini";
   name = "gemini" /* Gemini */;
@@ -83873,7 +83907,7 @@ var GeminiProvider = class {
     await writeSecretFile(credentialsPath, inputs.geminiCredentials);
     await (0, import_promises3.writeFile)(settingsPath, `${JSON.stringify(await this.mergeSettings(settingsPath), null, 2)}
 `, "utf8");
-    core4.saveState("gemini-credentials-path", credentialsPath);
+    core5.saveState("gemini-credentials-path", credentialsPath);
   }
   async cleanupAuth() {
     await removeStatePath("gemini-credentials-path");
@@ -126490,7 +126524,7 @@ If the error persists, please check whether Actions and API requests are operati
 var client = new DefaultArtifactClient();
 
 // src/sessions/collect.ts
-var core5 = __toESM(require_core());
+var core6 = __toESM(require_core());
 async function collectAndUploadSessions(inputs, provider) {
   const destination = (0, import_node_path3.resolve)(inputs.sessionFilesPath);
   let found = false;
@@ -126508,7 +126542,7 @@ async function collectAndUploadSessions(inputs, provider) {
       artifactId = String(upload.id ?? "");
       artifactUrl = buildArtifactUrl(artifactId);
     } else {
-      core5.warning(`No ${inputs.provider} session files found to upload`);
+      core6.warning(`No ${inputs.provider} session files found to upload`);
     }
   }
   return { artifactId, artifactUrl, found, path: destination };
@@ -126552,41 +126586,8 @@ function buildArtifactUrl(artifactId) {
   return `${serverUrl}/${repository}/actions/runs/${runId}/artifacts/${artifactId}`;
 }
 
-// src/action/inputs.ts
-var core6 = __toESM(require_core());
-var booleanSchema = external_exports.string().trim().toLowerCase().refine((value) => ["true", "false", "1", "0", "yes", "no"].includes(value), {
-  message: "Expected a boolean value"
-}).transform((value) => value === "true" || value === "1" || value === "yes");
-var inputsSchema = external_exports.object({
-  artifactName: external_exports.string(),
-  claudeCodeOauthToken: external_exports.string(),
-  codexAuthJson: external_exports.string(),
-  collectSessionFiles: booleanSchema,
-  exportEnv: booleanSchema,
-  geminiCredentials: external_exports.string(),
-  installCli: booleanSchema,
-  provider: external_exports.enum(ProviderName),
-  retentionDays: external_exports.coerce.number().int().min(1).max(90),
-  sessionFilesPath: external_exports.string().min(1),
-  uploadSessionFiles: booleanSchema
-});
-function readInputs() {
-  return inputsSchema.parse({
-    artifactName: core6.getInput("artifact-name"),
-    claudeCodeOauthToken: core6.getInput("claude-code-oauth-token"),
-    codexAuthJson: core6.getInput("codex-auth-json"),
-    collectSessionFiles: core6.getInput("collect-session-files") || "false",
-    exportEnv: core6.getInput("export-env") || "true",
-    geminiCredentials: core6.getInput("gemini-credentials"),
-    installCli: core6.getInput("install-cli") || "true",
-    provider: core6.getInput("provider"),
-    retentionDays: core6.getInput("retention-days") || "7",
-    sessionFilesPath: core6.getInput("session-files-path") || "provider-session-files",
-    uploadSessionFiles: core6.getInput("upload-session-files") || "false"
-  });
-}
-
-// src/action/run.ts
+// src/index.ts
+void run();
 async function run() {
   try {
     const inputs = readInputs();
@@ -126613,9 +126614,6 @@ function handleError(error52) {
   }
   core7.setFailed(error52 instanceof Error ? error52.message : String(error52));
 }
-
-// src/index.ts
-void run();
 /*! Bundled license information:
 
 undici/lib/fetch/body.js:

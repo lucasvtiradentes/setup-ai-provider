@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
-import type { ActionInputs } from '../action/inputs'
+import type { ActionInputs } from '../inputs'
 import type { AiProvider } from './shared/types'
 import { ProviderName } from './shared/types'
 

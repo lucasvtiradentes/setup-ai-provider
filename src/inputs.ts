@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import { z } from 'zod'
-import { ProviderName } from '../providers/shared/types'
+import { ProviderName } from './providers/shared/types'
 
 const booleanSchema = z
 	.string()
