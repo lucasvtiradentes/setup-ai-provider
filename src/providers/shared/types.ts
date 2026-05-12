@@ -1,4 +1,4 @@
-import type { ActionInputs } from '../../inputs'
+import type { ActionInputs } from '../../inputs/inputs'
 
 export enum ProviderName {
 	Claude = 'claude',

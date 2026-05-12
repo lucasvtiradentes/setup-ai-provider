@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import { ZodError } from 'zod'
-import { readSessionInputs } from './inputs'
+import { readSessionInputs } from './inputs/state'
 import { cleanupProviderAuth } from './providers/shared/auth'
 import { getProvider } from './providers/shared/registry'
 import { collectAndUploadSessions } from './sessions/collect'

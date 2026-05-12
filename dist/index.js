@@ -19822,7 +19822,7 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
 });
 
 // src/index.ts
-var core6 = __toESM(require_core());
+var core7 = __toESM(require_core());
 
 // node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/external.js
 var external_exports = {};
@@ -34338,18 +34338,7 @@ function date4(params) {
 // node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/external.js
 config(en_default());
 
-// src/inputs.ts
-var core = __toESM(require_core());
-
-// src/providers/shared/types.ts
-var ProviderName = /* @__PURE__ */ ((ProviderName2) => {
-  ProviderName2["Claude"] = "claude";
-  ProviderName2["Codex"] = "codex";
-  ProviderName2["Gemini"] = "gemini";
-  return ProviderName2;
-})(ProviderName || {});
-
-// src/inputs.ts
+// src/inputs/configs.ts
 var CONFIGS = {
   defaults: {
     artifactName: "",
@@ -34361,16 +34350,50 @@ var CONFIGS = {
 var booleanSchema = external_exports.string().trim().toLowerCase().refine((value) => ["true", "false", "1", "0", "yes", "no"].includes(value), {
   message: "Expected a boolean value"
 }).transform((value) => value === "true" || value === "1" || value === "yes");
+
+// src/inputs/inputs.ts
+var core = __toESM(require_core());
+
+// src/providers/shared/types.ts
+var ProviderName = /* @__PURE__ */ ((ProviderName2) => {
+  ProviderName2["Claude"] = "claude";
+  ProviderName2["Codex"] = "codex";
+  ProviderName2["Gemini"] = "gemini";
+  return ProviderName2;
+})(ProviderName || {});
+
+// src/inputs/inputs.ts
 var inputsSchema = external_exports.object({
-  artifactName: external_exports.string(),
+  // Step 1: select provider.
+  provider: external_exports.enum(ProviderName),
+  // Step 2: setup provider auth.
   claudeCodeOauthToken: external_exports.string(),
   codexAuthJson: external_exports.string(),
   geminiAuthJson: external_exports.string(),
-  provider: external_exports.enum(ProviderName),
+  // Step 3: upload provider session artifact.
+  artifactName: external_exports.string(),
   retentionDays: external_exports.coerce.number().int().min(1).max(90),
   sessionFilesPath: external_exports.string().min(1),
   uploadSessionFiles: booleanSchema
 });
+function readInputs() {
+  return inputsSchema.parse({
+    // Step 1: select provider.
+    provider: core.getInput("provider" /* Provider */),
+    // Step 2: setup provider auth.
+    claudeCodeOauthToken: core.getInput("claude-code-oauth-token" /* ClaudeCodeOauthToken */),
+    codexAuthJson: core.getInput("codex-auth-json" /* CodexAuthJson */),
+    geminiAuthJson: core.getInput("gemini-auth-json" /* GeminiAuthJson */),
+    // Step 3: upload provider session artifact.
+    artifactName: core.getInput("artifact-name" /* ArtifactName */),
+    retentionDays: core.getInput("retention-days" /* RetentionDays */) || CONFIGS.defaults.retentionDays,
+    sessionFilesPath: core.getInput("session-files-path" /* SessionFilesPath */) || CONFIGS.defaults.sessionFilesPath,
+    uploadSessionFiles: core.getInput("upload-session-files" /* UploadSessionFiles */) || CONFIGS.defaults.uploadSessionFiles
+  });
+}
+
+// src/inputs/state.ts
+var core2 = __toESM(require_core());
 var sessionInputsSchema = inputsSchema.pick({
   artifactName: true,
   provider: true,
@@ -34378,28 +34401,16 @@ var sessionInputsSchema = inputsSchema.pick({
   sessionFilesPath: true,
   uploadSessionFiles: true
 });
-function readInputs() {
-  return inputsSchema.parse({
-    artifactName: core.getInput("artifact-name" /* ArtifactName */),
-    claudeCodeOauthToken: core.getInput("claude-code-oauth-token" /* ClaudeCodeOauthToken */),
-    codexAuthJson: core.getInput("codex-auth-json" /* CodexAuthJson */),
-    geminiAuthJson: core.getInput("gemini-auth-json" /* GeminiAuthJson */),
-    provider: core.getInput("provider" /* Provider */),
-    retentionDays: core.getInput("retention-days" /* RetentionDays */) || CONFIGS.defaults.retentionDays,
-    sessionFilesPath: core.getInput("session-files-path" /* SessionFilesPath */) || CONFIGS.defaults.sessionFilesPath,
-    uploadSessionFiles: core.getInput("upload-session-files" /* UploadSessionFiles */) || CONFIGS.defaults.uploadSessionFiles
-  });
-}
 function saveSessionInputs(inputs) {
-  core.saveState("artifact-name" /* ArtifactName */, inputs.artifactName);
-  core.saveState("provider" /* Provider */, inputs.provider);
-  core.saveState("retention-days" /* RetentionDays */, String(inputs.retentionDays));
-  core.saveState("session-files-path" /* SessionFilesPath */, inputs.sessionFilesPath);
-  core.saveState("upload-session-files" /* UploadSessionFiles */, String(inputs.uploadSessionFiles));
+  core2.saveState("artifact-name" /* ArtifactName */, inputs.artifactName);
+  core2.saveState("provider" /* Provider */, inputs.provider);
+  core2.saveState("retention-days" /* RetentionDays */, String(inputs.retentionDays));
+  core2.saveState("session-files-path" /* SessionFilesPath */, inputs.sessionFilesPath);
+  core2.saveState("upload-session-files" /* UploadSessionFiles */, String(inputs.uploadSessionFiles));
 }
 
 // src/providers/claude.ts
-var core2 = __toESM(require_core());
+var core3 = __toESM(require_core());
 var exec = __toESM(require_exec());
 var ClaudeProvider = class {
   command = "claude";
@@ -34412,8 +34423,8 @@ var ClaudeProvider = class {
     if (!inputs.claudeCodeOauthToken) {
       return;
     }
-    core2.setSecret(inputs.claudeCodeOauthToken);
-    core2.exportVariable("CLAUDE_CODE_OAUTH_TOKEN", inputs.claudeCodeOauthToken);
+    core3.setSecret(inputs.claudeCodeOauthToken);
+    core3.exportVariable("CLAUDE_CODE_OAUTH_TOKEN", inputs.claudeCodeOauthToken);
   }
   async cleanupAuth() {
   }
@@ -34423,11 +34434,11 @@ var ClaudeProvider = class {
 var import_promises2 = require("fs/promises");
 var import_node_os = require("os");
 var import_node_path = require("path");
-var core4 = __toESM(require_core());
+var core5 = __toESM(require_core());
 
 // src/providers/shared/utils.ts
 var import_promises = require("fs/promises");
-var core3 = __toESM(require_core());
+var core4 = __toESM(require_core());
 var exec3 = __toESM(require_exec());
 async function installNpmPackage(packageName) {
   await exec3.exec("npm", ["install", "--global", packageName]);
@@ -34437,7 +34448,7 @@ async function writeSecretFile(path, content) {
   await (0, import_promises.chmod)(path, 384);
 }
 async function removeStatePath(name) {
-  const path = core3.getState(name);
+  const path = core4.getState(name);
   if (!path) {
     return;
   }
@@ -34458,7 +34469,7 @@ function readObject(value) {
   return value;
 }
 function maskJsonSecrets(content) {
-  core3.setSecret(content);
+  core4.setSecret(content);
   try {
     maskJsonValue(JSON.parse(content));
   } catch {
@@ -34480,7 +34491,7 @@ function maskJsonValue(value) {
   }
   for (const [key, item] of Object.entries(value)) {
     if (typeof item === "string" && isSecretKey(key)) {
-      core3.setSecret(item);
+      core4.setSecret(item);
     }
     maskJsonValue(item);
   }
@@ -34507,7 +34518,7 @@ var CodexProvider = class {
     const authPath = (0, import_node_path.join)(codexDir, "auth.json");
     await (0, import_promises2.mkdir)(codexDir, { recursive: true });
     await writeSecretFile(authPath, inputs.codexAuthJson);
-    core4.saveState("codex-auth-path", authPath);
+    core5.saveState("codex-auth-path", authPath);
   }
   async cleanupAuth() {
     await removeStatePath("codex-auth-path");
@@ -34518,7 +34529,7 @@ var CodexProvider = class {
 var import_promises3 = require("fs/promises");
 var import_node_os2 = require("os");
 var import_node_path2 = require("path");
-var core5 = __toESM(require_core());
+var core6 = __toESM(require_core());
 var GeminiProvider = class {
   command = "gemini";
   name = "gemini" /* Gemini */;
@@ -34538,7 +34549,7 @@ var GeminiProvider = class {
     await writeSecretFile(credentialsPath, inputs.geminiAuthJson);
     await (0, import_promises3.writeFile)(settingsPath, `${JSON.stringify(await this.mergeSettings(settingsPath), null, 2)}
 `, "utf8");
-    core5.saveState("gemini-auth-json-path", credentialsPath);
+    core6.saveState("gemini-auth-json-path", credentialsPath);
   }
   async cleanupAuth() {
     await removeStatePath("gemini-auth-json-path");
@@ -34581,8 +34592,8 @@ async function run() {
   try {
     const inputs = readInputs();
     const provider = getProvider(inputs.provider);
-    core6.setOutput("provider" /* Provider */, inputs.provider);
-    core6.setOutput("command" /* Command */, provider.command);
+    core7.setOutput("provider" /* Provider */, inputs.provider);
+    core7.setOutput("command" /* Command */, provider.command);
     await provider.install(inputs);
     await setupProviderAuth(inputs);
     saveSessionInputs(inputs);
@@ -34592,10 +34603,10 @@ async function run() {
 }
 function handleError(error51) {
   if (error51 instanceof ZodError) {
-    core6.setFailed(error51.issues.map((issue2) => `${issue2.path.join(".")}: ${issue2.message}`).join("\n"));
+    core7.setFailed(error51.issues.map((issue2) => `${issue2.path.join(".")}: ${issue2.message}`).join("\n"));
     return;
   }
-  core6.setFailed(error51 instanceof Error ? error51.message : String(error51));
+  core7.setFailed(error51 instanceof Error ? error51.message : String(error51));
 }
 /*! Bundled license information:
 

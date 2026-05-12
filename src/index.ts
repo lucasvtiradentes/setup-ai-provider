@@ -1,6 +1,8 @@
 import * as core from '@actions/core'
 import { ZodError } from 'zod'
-import { OutputName, readInputs, saveSessionInputs } from './inputs'
+import { OutputName } from './inputs/configs'
+import { readInputs } from './inputs/inputs'
+import { saveSessionInputs } from './inputs/state'
 import { setupProviderAuth } from './providers/shared/auth'
 import { getProvider } from './providers/shared/registry'
 

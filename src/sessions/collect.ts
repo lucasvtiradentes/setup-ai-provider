@@ -3,7 +3,7 @@ import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { DefaultArtifactClient } from '@actions/artifact'
 import * as core from '@actions/core'
-import type { SessionInputs } from '../inputs'
+import type { SessionInputs } from '../inputs/state'
 import type { AiProvider } from '../providers/shared/types'
 
 type SessionResult = {
