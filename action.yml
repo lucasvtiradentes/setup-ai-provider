@@ -16,7 +16,7 @@ inputs:
   codex-auth-json:
     description: 'Content for ~/.codex/auth.json'
     required: false
-  gemini-credentials:
+  gemini-auth-json:
     description: 'Content for ~/.gemini/oauth_creds.json'
     required: false
   collect-session-files:

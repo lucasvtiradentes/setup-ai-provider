@@ -11,7 +11,7 @@ const baseInputs: ActionInputs = {
 	claudeCodeOauthToken: '',
 	codexAuthJson: '',
 	collectSessionFiles: false,
-	geminiCredentials: '',
+	geminiAuthJson: '',
 	provider: ProviderName.Claude,
 	retentionDays: 7,
 	sessionFilesPath: 'provider-session-files',
@@ -50,7 +50,7 @@ describe('setupProviderAuth', () => {
 
 		await setupProviderAuth({
 			...baseInputs,
-			geminiCredentials: '{"refresh_token":"secret"}',
+			geminiAuthJson: '{"refresh_token":"secret"}',
 			provider: ProviderName.Gemini,
 		})
 

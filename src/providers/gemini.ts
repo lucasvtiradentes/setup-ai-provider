@@ -23,23 +23,23 @@ export class GeminiProvider implements AiProvider {
 	}
 
 	async setupAuth(inputs: ActionInputs): Promise<void> {
-		if (!inputs.geminiCredentials) {
+		if (!inputs.geminiAuthJson) {
 			return
 		}
 
-		maskJsonSecrets(inputs.geminiCredentials)
+		maskJsonSecrets(inputs.geminiAuthJson)
 
 		const geminiDir = join(homedir(), '.gemini')
 		const credentialsPath = join(geminiDir, 'oauth_creds.json')
 		const settingsPath = join(geminiDir, 'settings.json')
 		await mkdir(geminiDir, { recursive: true })
-		await writeSecretFile(credentialsPath, inputs.geminiCredentials)
+		await writeSecretFile(credentialsPath, inputs.geminiAuthJson)
 		await writeFile(settingsPath, `${JSON.stringify(await this.mergeSettings(settingsPath), null, 2)}\n`, 'utf8')
-		core.saveState('gemini-credentials-path', credentialsPath)
+		core.saveState('gemini-auth-json-path', credentialsPath)
 	}
 
 	async cleanupAuth(): Promise<void> {
-		await removeStatePath('gemini-credentials-path')
+		await removeStatePath('gemini-auth-json-path')
 	}
 
 	private async mergeSettings(path: string): Promise<Record<string, unknown>> {

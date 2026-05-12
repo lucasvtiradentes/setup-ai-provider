@@ -21,7 +21,7 @@ Supported providers:
 - uses: lucasvtiradentes/setup-ai-provider@v0
   with:
     provider: gemini
-    gemini-credentials: ${{ secrets.GEMINI_CREDENTIALS }}
+    gemini-auth-json: ${{ secrets.GEMINI_AUTH_JSON }}
 ```
 
 ```yaml
@@ -35,7 +35,7 @@ Supported providers:
 - uses: lucasvtiradentes/setup-ai-provider@v0
   with:
     provider: gemini
-    gemini-credentials: ${{ secrets.GEMINI_CREDENTIALS }}
+    gemini-auth-json: ${{ secrets.GEMINI_AUTH_JSON }}
     collect-session-files: 'true'
     upload-session-files: 'true'
 ```
@@ -49,7 +49,7 @@ Claude uses the official upstream installer script.
 | `provider`                |                          | Provider to setup: `claude`, `codex`, or `gemini`.     |
 | `claude-code-oauth-token` |                          | Claude Code OAuth token.                               |
 | `codex-auth-json`         |                          | Content for `~/.codex/auth.json`.                      |
-| `gemini-credentials`      |                          | Content for `~/.gemini/oauth_creds.json`.              |
+| `gemini-auth-json`        |                          | Content for `~/.gemini/oauth_creds.json`.              |
 | `collect-session-files`   | `false`                  | Copy provider session files into `session-files-path`. |
 | `session-files-path`      | `provider-session-files` | Destination for collected session files.               |
 | `upload-session-files`    | `false`                  | Upload collected session files as an artifact.         |

@@ -9,7 +9,7 @@ enum InputName {
 	// Step 2: setup provider auth.
 	ClaudeCodeOauthToken = 'claude-code-oauth-token',
 	CodexAuthJson = 'codex-auth-json',
-	GeminiCredentials = 'gemini-credentials',
+	GeminiAuthJson = 'gemini-auth-json',
 
 	// Step 3: collect provider session files.
 	CollectSessionFiles = 'collect-session-files',
@@ -54,7 +54,7 @@ const inputsSchema = z.object({
 	claudeCodeOauthToken: z.string(),
 	codexAuthJson: z.string(),
 	collectSessionFiles: booleanSchema,
-	geminiCredentials: z.string(),
+	geminiAuthJson: z.string(),
 	provider: z.enum(ProviderName),
 	retentionDays: z.coerce.number().int().min(1).max(90),
 	sessionFilesPath: z.string().min(1),
@@ -69,7 +69,7 @@ export function readInputs(): ActionInputs {
 		claudeCodeOauthToken: core.getInput(InputName.ClaudeCodeOauthToken),
 		codexAuthJson: core.getInput(InputName.CodexAuthJson),
 		collectSessionFiles: core.getInput(InputName.CollectSessionFiles) || CONFIGS.defaults.collectSessionFiles,
-		geminiCredentials: core.getInput(InputName.GeminiCredentials),
+		geminiAuthJson: core.getInput(InputName.GeminiAuthJson),
 		provider: core.getInput(InputName.Provider),
 		retentionDays: core.getInput(InputName.RetentionDays) || CONFIGS.defaults.retentionDays,
 		sessionFilesPath: core.getInput(InputName.SessionFilesPath) || CONFIGS.defaults.sessionFilesPath,

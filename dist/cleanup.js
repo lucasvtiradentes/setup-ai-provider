@@ -19949,21 +19949,21 @@ var GeminiProvider = class {
     await installNpmPackage("@google/gemini-cli");
   }
   async setupAuth(inputs) {
-    if (!inputs.geminiCredentials) {
+    if (!inputs.geminiAuthJson) {
       return;
     }
-    maskJsonSecrets(inputs.geminiCredentials);
+    maskJsonSecrets(inputs.geminiAuthJson);
     const geminiDir = (0, import_node_path2.join)((0, import_node_os2.homedir)(), ".gemini");
     const credentialsPath = (0, import_node_path2.join)(geminiDir, "oauth_creds.json");
     const settingsPath = (0, import_node_path2.join)(geminiDir, "settings.json");
     await (0, import_promises3.mkdir)(geminiDir, { recursive: true });
-    await writeSecretFile(credentialsPath, inputs.geminiCredentials);
+    await writeSecretFile(credentialsPath, inputs.geminiAuthJson);
     await (0, import_promises3.writeFile)(settingsPath, `${JSON.stringify(await this.mergeSettings(settingsPath), null, 2)}
 `, "utf8");
-    core4.saveState("gemini-credentials-path", credentialsPath);
+    core4.saveState("gemini-auth-json-path", credentialsPath);
   }
   async cleanupAuth() {
-    await removeStatePath("gemini-credentials-path");
+    await removeStatePath("gemini-auth-json-path");
   }
   async mergeSettings(path) {
     const settings = await readJsonObject(path);

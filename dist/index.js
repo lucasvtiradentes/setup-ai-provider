@@ -83750,7 +83750,7 @@ var inputsSchema = external_exports.object({
   claudeCodeOauthToken: external_exports.string(),
   codexAuthJson: external_exports.string(),
   collectSessionFiles: booleanSchema,
-  geminiCredentials: external_exports.string(),
+  geminiAuthJson: external_exports.string(),
   provider: external_exports.enum(ProviderName),
   retentionDays: external_exports.coerce.number().int().min(1).max(90),
   sessionFilesPath: external_exports.string().min(1),
@@ -83762,7 +83762,7 @@ function readInputs() {
     claudeCodeOauthToken: core.getInput("claude-code-oauth-token" /* ClaudeCodeOauthToken */),
     codexAuthJson: core.getInput("codex-auth-json" /* CodexAuthJson */),
     collectSessionFiles: core.getInput("collect-session-files" /* CollectSessionFiles */) || CONFIGS.defaults.collectSessionFiles,
-    geminiCredentials: core.getInput("gemini-credentials" /* GeminiCredentials */),
+    geminiAuthJson: core.getInput("gemini-auth-json" /* GeminiAuthJson */),
     provider: core.getInput("provider" /* Provider */),
     retentionDays: core.getInput("retention-days" /* RetentionDays */) || CONFIGS.defaults.retentionDays,
     sessionFilesPath: core.getInput("session-files-path" /* SessionFilesPath */) || CONFIGS.defaults.sessionFilesPath,
@@ -83899,21 +83899,21 @@ var GeminiProvider = class {
     await installNpmPackage("@google/gemini-cli");
   }
   async setupAuth(inputs) {
-    if (!inputs.geminiCredentials) {
+    if (!inputs.geminiAuthJson) {
       return;
     }
-    maskJsonSecrets(inputs.geminiCredentials);
+    maskJsonSecrets(inputs.geminiAuthJson);
     const geminiDir = (0, import_node_path2.join)((0, import_node_os2.homedir)(), ".gemini");
     const credentialsPath = (0, import_node_path2.join)(geminiDir, "oauth_creds.json");
     const settingsPath = (0, import_node_path2.join)(geminiDir, "settings.json");
     await (0, import_promises3.mkdir)(geminiDir, { recursive: true });
-    await writeSecretFile(credentialsPath, inputs.geminiCredentials);
+    await writeSecretFile(credentialsPath, inputs.geminiAuthJson);
     await (0, import_promises3.writeFile)(settingsPath, `${JSON.stringify(await this.mergeSettings(settingsPath), null, 2)}
 `, "utf8");
-    core5.saveState("gemini-credentials-path", credentialsPath);
+    core5.saveState("gemini-auth-json-path", credentialsPath);
   }
   async cleanupAuth() {
-    await removeStatePath("gemini-credentials-path");
+    await removeStatePath("gemini-auth-json-path");
   }
   async mergeSettings(path4) {
     const settings = await readJsonObject(path4);
