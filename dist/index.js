@@ -19718,7 +19718,7 @@ var require_core = __commonJS({
 Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
     }
     exports2.getBooleanInput = getBooleanInput;
-    function setOutput2(name, value) {
+    function setOutput(name, value) {
       const filePath = process.env["GITHUB_OUTPUT"] || "";
       if (filePath) {
         return (0, file_command_1.issueFileCommand)("OUTPUT", (0, file_command_1.prepareKeyValueMessage)(name, value));
@@ -19726,7 +19726,7 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
       process.stdout.write(os.EOL);
       (0, command_1.issueCommand)("set-output", { name }, (0, utils_1.toCommandValue)(value));
     }
-    exports2.setOutput = setOutput2;
+    exports2.setOutput = setOutput;
     function setCommandEcho(enabled) {
       (0, command_1.issue)("echo", enabled ? "on" : "off");
     }
@@ -34338,6 +34338,17 @@ function date4(params) {
 // node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/external.js
 config(en_default());
 
+// src/inputs/inputs.ts
+var core = __toESM(require_core());
+
+// src/providers/shared/types.ts
+var ProviderName = /* @__PURE__ */ ((ProviderName2) => {
+  ProviderName2["Claude"] = "claude";
+  ProviderName2["Codex"] = "codex";
+  ProviderName2["Gemini"] = "gemini";
+  return ProviderName2;
+})(ProviderName || {});
+
 // src/inputs/configs.ts
 var CONFIGS = {
   defaults: {
@@ -34350,17 +34361,6 @@ var CONFIGS = {
 var booleanSchema = external_exports.string().trim().toLowerCase().refine((value) => ["true", "false", "1", "0", "yes", "no"].includes(value), {
   message: "Expected a boolean value"
 }).transform((value) => value === "true" || value === "1" || value === "yes");
-
-// src/inputs/inputs.ts
-var core = __toESM(require_core());
-
-// src/providers/shared/types.ts
-var ProviderName = /* @__PURE__ */ ((ProviderName2) => {
-  ProviderName2["Claude"] = "claude";
-  ProviderName2["Codex"] = "codex";
-  ProviderName2["Gemini"] = "gemini";
-  return ProviderName2;
-})(ProviderName || {});
 
 // src/inputs/inputs.ts
 var inputsSchema = external_exports.object({
@@ -34592,8 +34592,6 @@ async function run() {
   try {
     const inputs = readInputs();
     const provider = getProvider(inputs.provider);
-    core7.setOutput("provider" /* Provider */, inputs.provider);
-    core7.setOutput("command" /* Command */, provider.command);
     await provider.install(inputs);
     await setupProviderAuth(inputs);
     saveSessionInputs(inputs);

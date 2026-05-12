@@ -1,10 +1,5 @@
 import { z } from 'zod'
 
-export enum OutputName {
-	Command = 'command',
-	Provider = 'provider',
-}
-
 export const CONFIGS = {
 	defaults: {
 		artifactName: '',

@@ -41,12 +41,6 @@ inputs:
     required: false
     default: '7'
 
-outputs:
-  provider:
-    description: 'The selected provider'
-  command:
-    description: 'The provider CLI command name'
-
 runs:
   using: 'node24'
   main: 'dist/index.js'
