@@ -28,7 +28,7 @@ jobs:
     outputs:
       should_release_action: ${{ steps.check.outputs.should_release_action }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 2
 
@@ -44,7 +44,7 @@ jobs:
     if: inputs.run_lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: ./.github/actions/setup-and-install
 
@@ -58,7 +58,7 @@ jobs:
     if: inputs.run_build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: ./.github/actions/setup-and-install
 
@@ -75,7 +75,7 @@ jobs:
     if: inputs.run_test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: ./.github/actions/setup-and-install
 

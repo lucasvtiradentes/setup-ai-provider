@@ -11,11 +11,11 @@ runs:
   using: composite
   steps:
     - name: Install pnpm
-      uses: pnpm/action-setup@v4
+      uses: pnpm/action-setup@v6
 
     - name: Setup Node.js with pnpm cache
       if: ${{ inputs.skip-install != 'true' }}
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
         node-version: 24
         cache: 'pnpm'
@@ -23,7 +23,7 @@ runs:
 
     - name: Setup Node.js without cache
       if: ${{ inputs.skip-install == 'true' }}
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
         node-version: 24
         package-manager-cache: false
