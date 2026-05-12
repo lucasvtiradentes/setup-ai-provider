@@ -63,7 +63,7 @@ outputs:
     description: 'Uploaded artifact URL when upload-session-files is true'
 
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/index.js'
   post: 'dist/cleanup.js'
   post-if: 'always()'
