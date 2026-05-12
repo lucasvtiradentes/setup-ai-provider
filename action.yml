@@ -7,9 +7,12 @@ branding:
   color: 'blue'
 
 inputs:
+  # Step 1: select provider.
   provider:
     description: 'AI provider to setup: claude, codex, or gemini'
     required: true
+
+  # Step 2: setup provider auth.
   claude-code-oauth-token:
     description: 'Claude Code OAuth token'
     required: false
@@ -19,6 +22,8 @@ inputs:
   gemini-auth-json:
     description: 'Content for ~/.gemini/oauth_creds.json'
     required: false
+
+  # Step 3: upload provider session artifact.
   session-files-path:
     description: 'Temporary path used during post-step session upload'
     required: false
