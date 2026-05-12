@@ -1,0 +1,26 @@
+name: Manual E2E Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_claude:
+        description: Run Claude e2e tests
+        type: boolean
+        default: true
+      run_codex:
+        description: Run Codex e2e tests
+        type: boolean
+        default: true
+      run_gemini:
+        description: Run Gemini e2e tests
+        type: boolean
+        default: true
+
+jobs:
+  e2e:
+    uses: ./.github/workflows/callable-run-e2e-tests.yml
+    with:
+      run_claude: ${{ inputs.run_claude }}
+      run_codex: ${{ inputs.run_codex }}
+      run_gemini: ${{ inputs.run_gemini }}
+    secrets: inherit

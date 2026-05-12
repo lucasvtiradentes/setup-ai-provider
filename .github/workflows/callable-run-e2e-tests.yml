@@ -1,0 +1,82 @@
+name: _callable e2e tests
+
+on:
+  workflow_call:
+    inputs:
+      run_claude:
+        description: Run Claude e2e tests
+        type: boolean
+        required: true
+      run_codex:
+        description: Run Codex e2e tests
+        type: boolean
+        required: true
+      run_gemini:
+        description: Run Gemini e2e tests
+        type: boolean
+        required: true
+    secrets:
+      CLAUDE_CODE_OAUTH_TOKEN:
+        required: false
+      CODEX_AUTH_JSON:
+        required: false
+      GEMINI_CREDENTIALS:
+        required: false
+
+env:
+  E2E_PROMPT: Reply with only OK.
+
+jobs:
+  test-e2e-claude:
+    if: ${{ inputs.run_claude }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-and-install
+      - name: Build local action
+        run: pnpm run build
+      - uses: ./
+        with:
+          provider: claude
+          claude-code-oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          artifact-name: claude-session-raw-files
+          upload-session-files: 'true'
+      - name: Run Claude
+        run: claude -p "${{ env.E2E_PROMPT }}" --print --dangerously-skip-permissions
+
+  test-e2e-codex:
+    if: ${{ inputs.run_codex }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-and-install
+      - name: Build local action
+        run: pnpm run build
+      - uses: ./
+        with:
+          provider: codex
+          codex-auth-json: ${{ secrets.CODEX_AUTH_JSON }}
+          artifact-name: codex-session-raw-files
+          upload-session-files: 'true'
+      - name: Run Codex
+        run: codex exec "${{ env.E2E_PROMPT }}" --json --dangerously-bypass-approvals-and-sandbox
+
+  test-e2e-gemini:
+    if: ${{ inputs.run_gemini }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-and-install
+      - name: Build local action
+        run: pnpm run build
+      - uses: ./
+        with:
+          provider: gemini
+          gemini-auth-json: ${{ secrets.GEMINI_CREDENTIALS }}
+          artifact-name: gemini-session-raw-files
+          upload-session-files: 'true'
+      - name: Run Gemini
+        run: gemini -p "${{ env.E2E_PROMPT }}" --yolo
