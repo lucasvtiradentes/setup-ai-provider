@@ -16,13 +16,11 @@ Setup AI Provider prepares AI coding agent CLIs for GitHub Actions by installing
 
 ## ❓ Motivation
 
-I wanted AI coding agents running in CI across many repositories, but duplicating their setup everywhere was getting hard to maintain.
-
-This action keeps that provider setup in one place and makes switching providers a small workflow change.
+I wanted AI coding agents in CI across many repositories without duplicating setup everywhere. This action keeps provider setup centralized and easy to switch.
 
 ## ⭐ Features
 
-- One CI setup flow for Claude Code, Codex, and Gemini.
+- One CI setup flow for [Claude Code](https://claude.com/product/claude-code), [Codex](https://openai.com/codex/), and [Gemini](https://geminicli.com/).
 - Provider switching through one workflow input.
 - Optional post-step session upload for debugging or formatting with tools like Pretty Session.
 
@@ -42,6 +40,7 @@ gh secret set CLAUDE_CODE_OAUTH_TOKEN -b '<token>'
   with:
     provider: claude
     claude-code-oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+    upload-session-files: 'true' # optional
 - run: claude -p "review this pull request" --print --dangerously-skip-permissions
 ```
 
@@ -64,7 +63,7 @@ gh secret set CODEX_AUTH_JSON < ~/.codex/auth.json
   with:
     provider: codex
     codex-auth-json: ${{ secrets.CODEX_AUTH_JSON }}
-    upload-session-files: 'true'
+    upload-session-files: 'true' # optional
 - run: codex exec "review this pull request" --json --dangerously-bypass-approvals-and-sandbox
 ```
 
@@ -91,6 +90,7 @@ gh secret set GEMINI_CREDENTIALS < ~/.gemini/oauth_creds.json
   with:
     provider: gemini
     gemini-auth-json: ${{ secrets.GEMINI_CREDENTIALS }}
+    upload-session-files: 'true' # optional
 - run: gemini -p "review this pull request" --yolo
 ```
 
@@ -102,13 +102,15 @@ The action also marks the CI workspace as trusted for Gemini CLI runs.
 
 ## 📥 Inputs
 
+<br />
+
 <div align="center">
 
 <table>
   <thead>
     <tr>
       <th>Group</th>
-      <th>Input</th>
+      <th width="250">Input</th>
       <th>Description</th>
     </tr>
   </thead>
