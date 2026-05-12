@@ -19667,7 +19667,7 @@ var require_core = __commonJS({
       ExitCode3[ExitCode3["Success"] = 0] = "Success";
       ExitCode3[ExitCode3["Failure"] = 1] = "Failure";
     })(ExitCode2 || (exports2.ExitCode = ExitCode2 = {}));
-    function exportVariable2(name, val) {
+    function exportVariable3(name, val) {
       const convertedVal = (0, utils_1.toCommandValue)(val);
       process.env[name] = convertedVal;
       const filePath = process.env["GITHUB_ENV"] || "";
@@ -19676,7 +19676,7 @@ var require_core = __commonJS({
       }
       (0, command_1.issueCommand)("set-env", { name }, convertedVal);
     }
-    exports2.exportVariable = exportVariable2;
+    exports2.exportVariable = exportVariable3;
     function setSecret4(secret) {
       (0, command_1.issueCommand)("add-mask", {}, secret);
     }
@@ -83925,6 +83925,7 @@ var GeminiProvider = class {
     await writeSecretFile(credentialsPath, inputs.geminiAuthJson);
     await (0, import_promises3.writeFile)(settingsPath, `${JSON.stringify(await this.mergeSettings(settingsPath), null, 2)}
 `, "utf8");
+    core6.exportVariable("GEMINI_CLI_TRUST_WORKSPACE", "true");
     core6.saveState("gemini-auth-json-path", credentialsPath);
   }
   async cleanupAuth() {

@@ -18,9 +18,11 @@ const baseInputs: ActionInputs = {
 }
 
 const originalHome = process.env.HOME
+const originalGeminiTrustWorkspace = process.env.GEMINI_CLI_TRUST_WORKSPACE
 
 afterEach(() => {
 	process.env.HOME = originalHome
+	process.env.GEMINI_CLI_TRUST_WORKSPACE = originalGeminiTrustWorkspace
 })
 
 describe('setupProviderAuth', () => {
@@ -60,5 +62,6 @@ describe('setupProviderAuth', () => {
 		expect((await stat(credentialsPath)).mode & 0o777).toBe(0o600)
 		expect(settings.theme).toBe('dark')
 		expect(settings.security.auth.selectedType).toBe('oauth-personal')
+		expect(process.env.GEMINI_CLI_TRUST_WORKSPACE).toBe('true')
 	})
 })

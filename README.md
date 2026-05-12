@@ -3,7 +3,7 @@
 <div align="center">
   <div>Setup AI Provider</div>
   <br />
-  <a href="#-overview">Overview</a> • <a href="#-motivation">Motivation</a> • <a href="#-features">Features</a> • <a href="#-setup">Setup</a> • <a href="#-usage">Usage</a> • <a href="#-inputs">Inputs</a> • <a href="#-license">License</a>
+  <a href="#-overview">Overview</a> • <a href="#-motivation">Motivation</a> • <a href="#-features">Features</a> • <a href="#-setup">Setup</a> • <a href="#-inputs">Inputs</a> • <a href="#-license">License</a>
 </div>
 
 <div width="100%" align="center">
@@ -28,37 +28,13 @@ This action keeps that provider setup in one place and makes switching providers
 
 ## 🚀 Setup
 
-Create the GitHub secrets used by your workflows.
+After this action runs, use the provider CLI in the next workflow steps however you want.
 
-Claude:
+### Claude
 
 ```sh
 claude setup-token
 gh secret set CLAUDE_CODE_OAUTH_TOKEN -b '<token>'
-```
-
-Codex:
-
-```sh
-gh secret set CODEX_AUTH_JSON < ~/.codex/auth.json
-```
-
-Gemini:
-
-```sh
-npm install -g @google/gemini-cli
-gemini
-gh secret set GEMINI_CREDENTIALS < ~/.gemini/oauth_creds.json
-```
-
-## 🧰 Usage
-
-```yaml
-- uses: lucasvtiradentes/setup-ai-provider@v0.1.0
-  with:
-    provider: codex
-    codex-auth-json: ${{ secrets.CODEX_AUTH_JSON }}
-    upload-session-files: 'true'
 ```
 
 ```yaml
@@ -66,6 +42,48 @@ gh secret set GEMINI_CREDENTIALS < ~/.gemini/oauth_creds.json
   with:
     provider: claude
     claude-code-oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+- run: claude -p "review this pull request" --print --dangerously-skip-permissions
+```
+
+### Codex
+
+<div align="center">
+<details>
+<summary>Show setup</summary>
+
+<div align="left">
+
+<br />
+
+```sh
+gh secret set CODEX_AUTH_JSON < ~/.codex/auth.json
+```
+
+```yaml
+- uses: lucasvtiradentes/setup-ai-provider@v0.1.0
+  with:
+    provider: codex
+    codex-auth-json: ${{ secrets.CODEX_AUTH_JSON }}
+    upload-session-files: 'true'
+- run: codex exec "review this pull request" --json --dangerously-bypass-approvals-and-sandbox
+```
+
+</div>
+</details>
+</div>
+
+### Gemini
+
+<div align="center">
+<details>
+<summary>Show setup</summary>
+
+<div align="left">
+<br />
+
+```sh
+npm install -g @google/gemini-cli
+gh secret set GEMINI_CREDENTIALS < ~/.gemini/oauth_creds.json
 ```
 
 ```yaml
@@ -73,22 +91,64 @@ gh secret set GEMINI_CREDENTIALS < ~/.gemini/oauth_creds.json
   with:
     provider: gemini
     gemini-auth-json: ${{ secrets.GEMINI_CREDENTIALS }}
+- run: gemini -p "review this pull request" --yolo
 ```
+
+The action also marks the CI workspace as trusted for Gemini CLI runs.
+
+</div>
+</details>
+</div>
 
 ## 📥 Inputs
 
 <div align="center">
 
-| Input                     | Default                  | Description                                            |
-| ------------------------- | ------------------------ | ------------------------------------------------------ |
-| `provider`                |                          | Provider to setup: `claude`, `codex`, or `gemini`.     |
-| `claude-code-oauth-token` |                          | Claude Code OAuth token.                               |
-| `codex-auth-json`         |                          | Content for `~/.codex/auth.json`.                      |
-| `gemini-auth-json`        |                          | Content for `~/.gemini/oauth_creds.json`.              |
-| `session-files-path`      | `provider-session-files` | Temporary path used during post-step session upload.   |
-| `upload-session-files`    | `false`                  | Upload collected session files as an artifact.         |
-| `artifact-name`           |                          | Artifact name. Defaults to `<provider>-session-files`. |
-| `retention-days`          | `7`                      | Artifact retention days.                               |
+<table>
+  <thead>
+    <tr>
+      <th>Group</th>
+      <th>Input</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="4">Auth</td>
+      <td><code>provider</code></td>
+      <td>Provider to setup: <code>claude</code>, <code>codex</code>, or <code>gemini</code>.</td>
+    </tr>
+    <tr>
+      <td><code>claude-code-oauth-token</code></td>
+      <td>Claude Code OAuth token.</td>
+    </tr>
+    <tr>
+      <td><code>codex-auth-json</code></td>
+      <td>Content for <code>~/.codex/auth.json</code>.</td>
+    </tr>
+    <tr>
+      <td><code>gemini-auth-json</code></td>
+      <td>Content for <code>~/.gemini/oauth_creds.json</code>.</td>
+    </tr>
+    <tr>
+      <td rowspan="4">Session</td>
+      <td><code>session-files-path</code></td>
+      <td>Temporary path used during post-step session upload. Default: <code>provider-session-files</code>.</td>
+    </tr>
+    <tr>
+      <td><code>upload-session-files</code></td>
+      <td>Upload collected session files as an artifact. Default: <code>false</code>.</td>
+    </tr>
+    <tr>
+      <td><code>artifact-name</code></td>
+      <td>Artifact name. Default: <code>&lt;provider&gt;-session-files</code>.</td>
+    </tr>
+    <tr>
+      <td><code>retention-days</code></td>
+      <td>Artifact retention days. Default: <code>7</code>.</td>
+    </tr>
+  </tbody>
+</table>
 
 </div>
 

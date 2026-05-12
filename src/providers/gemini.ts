@@ -35,6 +35,7 @@ export class GeminiProvider implements AiProvider {
 		await mkdir(geminiDir, { recursive: true })
 		await writeSecretFile(credentialsPath, inputs.geminiAuthJson)
 		await writeFile(settingsPath, `${JSON.stringify(await this.mergeSettings(settingsPath), null, 2)}\n`, 'utf8')
+		core.exportVariable('GEMINI_CLI_TRUST_WORKSPACE', 'true')
 		core.saveState('gemini-auth-json-path', credentialsPath)
 	}
 
