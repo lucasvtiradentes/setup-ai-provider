@@ -1,9 +1,8 @@
 import * as core from '@actions/core'
 import { ZodError } from 'zod'
-import { OutputName, readInputs } from './inputs'
+import { OutputName, readInputs, saveSessionInputs } from './inputs'
 import { setupProviderAuth } from './providers/shared/auth'
 import { getProvider } from './providers/shared/registry'
-import { collectAndUploadSessions } from './sessions/collect'
 
 void run()
 
@@ -17,12 +16,7 @@ async function run(): Promise<void> {
 
 		await provider.install(inputs)
 		await setupProviderAuth(inputs)
-
-		const sessions = await collectAndUploadSessions(inputs, provider)
-		core.setOutput(OutputName.SessionFilesPath, sessions.path)
-		core.setOutput(OutputName.SessionFilesFound, String(sessions.found))
-		core.setOutput(OutputName.ArtifactId, sessions.artifactId)
-		core.setOutput(OutputName.ArtifactUrl, sessions.artifactUrl)
+		saveSessionInputs(inputs)
 	} catch (error) {
 		handleError(error)
 	}

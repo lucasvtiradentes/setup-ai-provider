@@ -19,12 +19,8 @@ inputs:
   gemini-auth-json:
     description: 'Content for ~/.gemini/oauth_creds.json'
     required: false
-  collect-session-files:
-    description: 'Copy provider session files into session-files-path'
-    required: false
-    default: 'false'
   session-files-path:
-    description: 'Destination path for collected provider session files'
+    description: 'Temporary path used during post-step session upload'
     required: false
     default: 'provider-session-files'
   upload-session-files:
@@ -45,14 +41,6 @@ outputs:
     description: 'The selected provider'
   command:
     description: 'The provider CLI command name'
-  session-files-path:
-    description: 'Directory containing collected provider session files'
-  session-files-found:
-    description: 'Whether provider session files were found'
-  artifact-id:
-    description: 'Uploaded artifact ID when upload-session-files is true'
-  artifact-url:
-    description: 'Uploaded artifact URL when upload-session-files is true'
 
 runs:
   using: 'node24'

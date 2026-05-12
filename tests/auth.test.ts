@@ -10,7 +10,6 @@ const baseInputs: ActionInputs = {
 	artifactName: '',
 	claudeCodeOauthToken: '',
 	codexAuthJson: '',
-	collectSessionFiles: false,
 	geminiAuthJson: '',
 	provider: ProviderName.Claude,
 	retentionDays: 7,

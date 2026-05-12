@@ -3,7 +3,7 @@ import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { DefaultArtifactClient } from '@actions/artifact'
 import * as core from '@actions/core'
-import type { ActionInputs } from '../inputs'
+import type { SessionInputs } from '../inputs'
 import type { AiProvider } from '../providers/shared/types'
 
 type SessionResult = {
@@ -13,11 +13,11 @@ type SessionResult = {
 	path: string
 }
 
-export async function collectAndUploadSessions(inputs: ActionInputs, provider: AiProvider): Promise<SessionResult> {
+export async function collectAndUploadSessions(inputs: SessionInputs, provider: AiProvider): Promise<SessionResult> {
 	const destination = resolve(inputs.sessionFilesPath)
 	let found = false
 
-	if (inputs.collectSessionFiles || inputs.uploadSessionFiles) {
+	if (inputs.uploadSessionFiles) {
 		found = await collectSessions(provider, destination)
 	}
 
@@ -72,7 +72,7 @@ async function listFiles(path: string): Promise<string[]> {
 	return entries.filter((entry) => entry.isFile()).map((entry) => join(entry.parentPath, entry.name))
 }
 
-function getArtifactName(inputs: ActionInputs): string {
+function getArtifactName(inputs: SessionInputs): string {
 	return inputs.artifactName || `${inputs.provider}-session-files`
 }
 
