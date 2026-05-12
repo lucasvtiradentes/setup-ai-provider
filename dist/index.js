@@ -83733,6 +83733,17 @@ var ProviderName = /* @__PURE__ */ ((ProviderName2) => {
 })(ProviderName || {});
 
 // src/inputs.ts
+var CONFIGS = {
+  defaults: {
+    artifactName: "",
+    collectSessionFiles: "false",
+    exportEnv: "true",
+    installCli: "true",
+    retentionDays: "7",
+    sessionFilesPath: "provider-session-files",
+    uploadSessionFiles: "false"
+  }
+};
 var booleanSchema = external_exports.string().trim().toLowerCase().refine((value) => ["true", "false", "1", "0", "yes", "no"].includes(value), {
   message: "Expected a boolean value"
 }).transform((value) => value === "true" || value === "1" || value === "yes");
@@ -83751,17 +83762,17 @@ var inputsSchema = external_exports.object({
 });
 function readInputs() {
   return inputsSchema.parse({
-    artifactName: core.getInput("artifact-name"),
-    claudeCodeOauthToken: core.getInput("claude-code-oauth-token"),
-    codexAuthJson: core.getInput("codex-auth-json"),
-    collectSessionFiles: core.getInput("collect-session-files") || "false",
-    exportEnv: core.getInput("export-env") || "true",
-    geminiCredentials: core.getInput("gemini-credentials"),
-    installCli: core.getInput("install-cli") || "true",
-    provider: core.getInput("provider"),
-    retentionDays: core.getInput("retention-days") || "7",
-    sessionFilesPath: core.getInput("session-files-path") || "provider-session-files",
-    uploadSessionFiles: core.getInput("upload-session-files") || "false"
+    artifactName: core.getInput("artifact-name" /* ArtifactName */),
+    claudeCodeOauthToken: core.getInput("claude-code-oauth-token" /* ClaudeCodeOauthToken */),
+    codexAuthJson: core.getInput("codex-auth-json" /* CodexAuthJson */),
+    collectSessionFiles: core.getInput("collect-session-files" /* CollectSessionFiles */) || CONFIGS.defaults.collectSessionFiles,
+    exportEnv: core.getInput("export-env" /* ExportEnv */) || CONFIGS.defaults.exportEnv,
+    geminiCredentials: core.getInput("gemini-credentials" /* GeminiCredentials */),
+    installCli: core.getInput("install-cli" /* InstallCli */) || CONFIGS.defaults.installCli,
+    provider: core.getInput("provider" /* Provider */),
+    retentionDays: core.getInput("retention-days" /* RetentionDays */) || CONFIGS.defaults.retentionDays,
+    sessionFilesPath: core.getInput("session-files-path" /* SessionFilesPath */) || CONFIGS.defaults.sessionFilesPath,
+    uploadSessionFiles: core.getInput("upload-session-files" /* UploadSessionFiles */) || CONFIGS.defaults.uploadSessionFiles
   });
 }
 
@@ -126592,17 +126603,17 @@ async function run() {
   try {
     const inputs = readInputs();
     const provider = getProvider(inputs.provider);
-    core7.setOutput("provider", inputs.provider);
-    core7.setOutput("command", provider.command);
+    core7.setOutput("provider" /* Provider */, inputs.provider);
+    core7.setOutput("command" /* Command */, provider.command);
     if (inputs.installCli) {
       await provider.install(inputs);
     }
     await setupProviderAuth(inputs);
     const sessions = await collectAndUploadSessions(inputs, provider);
-    core7.setOutput("session-files-path", sessions.path);
-    core7.setOutput("session-files-found", String(sessions.found));
-    core7.setOutput("artifact-id", sessions.artifactId);
-    core7.setOutput("artifact-url", sessions.artifactUrl);
+    core7.setOutput("session-files-path" /* SessionFilesPath */, sessions.path);
+    core7.setOutput("session-files-found" /* SessionFilesFound */, String(sessions.found));
+    core7.setOutput("artifact-id" /* ArtifactId */, sessions.artifactId);
+    core7.setOutput("artifact-url" /* ArtifactUrl */, sessions.artifactUrl);
   } catch (error52) {
     handleError(error52);
   }
