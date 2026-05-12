@@ -3,17 +3,22 @@ import { z } from 'zod'
 import { ProviderName } from './providers/shared/types'
 
 enum InputName {
-	ArtifactName = 'artifact-name',
+	// Step 1: select provider.
+	Provider = 'provider',
+
+	// Step 2: setup provider auth.
 	ClaudeCodeOauthToken = 'claude-code-oauth-token',
 	CodexAuthJson = 'codex-auth-json',
-	CollectSessionFiles = 'collect-session-files',
-	ExportEnv = 'export-env',
 	GeminiCredentials = 'gemini-credentials',
-	InstallCli = 'install-cli',
-	Provider = 'provider',
-	RetentionDays = 'retention-days',
+
+	// Step 3: collect provider session files.
+	CollectSessionFiles = 'collect-session-files',
 	SessionFilesPath = 'session-files-path',
+
+	// Step 4: upload provider session artifact.
 	UploadSessionFiles = 'upload-session-files',
+	ArtifactName = 'artifact-name',
+	RetentionDays = 'retention-days',
 }
 
 export enum OutputName {
@@ -29,8 +34,6 @@ const CONFIGS = {
 	defaults: {
 		artifactName: '',
 		collectSessionFiles: 'false',
-		exportEnv: 'true',
-		installCli: 'true',
 		retentionDays: '7',
 		sessionFilesPath: 'provider-session-files',
 		uploadSessionFiles: 'false',
@@ -51,9 +54,7 @@ const inputsSchema = z.object({
 	claudeCodeOauthToken: z.string(),
 	codexAuthJson: z.string(),
 	collectSessionFiles: booleanSchema,
-	exportEnv: booleanSchema,
 	geminiCredentials: z.string(),
-	installCli: booleanSchema,
 	provider: z.enum(ProviderName),
 	retentionDays: z.coerce.number().int().min(1).max(90),
 	sessionFilesPath: z.string().min(1),
@@ -68,9 +69,7 @@ export function readInputs(): ActionInputs {
 		claudeCodeOauthToken: core.getInput(InputName.ClaudeCodeOauthToken),
 		codexAuthJson: core.getInput(InputName.CodexAuthJson),
 		collectSessionFiles: core.getInput(InputName.CollectSessionFiles) || CONFIGS.defaults.collectSessionFiles,
-		exportEnv: core.getInput(InputName.ExportEnv) || CONFIGS.defaults.exportEnv,
 		geminiCredentials: core.getInput(InputName.GeminiCredentials),
-		installCli: core.getInput(InputName.InstallCli) || CONFIGS.defaults.installCli,
 		provider: core.getInput(InputName.Provider),
 		retentionDays: core.getInput(InputName.RetentionDays) || CONFIGS.defaults.retentionDays,
 		sessionFilesPath: core.getInput(InputName.SessionFilesPath) || CONFIGS.defaults.sessionFilesPath,

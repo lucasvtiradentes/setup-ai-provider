@@ -83737,8 +83737,6 @@ var CONFIGS = {
   defaults: {
     artifactName: "",
     collectSessionFiles: "false",
-    exportEnv: "true",
-    installCli: "true",
     retentionDays: "7",
     sessionFilesPath: "provider-session-files",
     uploadSessionFiles: "false"
@@ -83752,9 +83750,7 @@ var inputsSchema = external_exports.object({
   claudeCodeOauthToken: external_exports.string(),
   codexAuthJson: external_exports.string(),
   collectSessionFiles: booleanSchema,
-  exportEnv: booleanSchema,
   geminiCredentials: external_exports.string(),
-  installCli: booleanSchema,
   provider: external_exports.enum(ProviderName),
   retentionDays: external_exports.coerce.number().int().min(1).max(90),
   sessionFilesPath: external_exports.string().min(1),
@@ -83766,9 +83762,7 @@ function readInputs() {
     claudeCodeOauthToken: core.getInput("claude-code-oauth-token" /* ClaudeCodeOauthToken */),
     codexAuthJson: core.getInput("codex-auth-json" /* CodexAuthJson */),
     collectSessionFiles: core.getInput("collect-session-files" /* CollectSessionFiles */) || CONFIGS.defaults.collectSessionFiles,
-    exportEnv: core.getInput("export-env" /* ExportEnv */) || CONFIGS.defaults.exportEnv,
     geminiCredentials: core.getInput("gemini-credentials" /* GeminiCredentials */),
-    installCli: core.getInput("install-cli" /* InstallCli */) || CONFIGS.defaults.installCli,
     provider: core.getInput("provider" /* Provider */),
     retentionDays: core.getInput("retention-days" /* RetentionDays */) || CONFIGS.defaults.retentionDays,
     sessionFilesPath: core.getInput("session-files-path" /* SessionFilesPath */) || CONFIGS.defaults.sessionFilesPath,
@@ -83791,9 +83785,7 @@ var ClaudeProvider = class {
       return;
     }
     core2.setSecret(inputs.claudeCodeOauthToken);
-    if (inputs.exportEnv) {
-      core2.exportVariable("CLAUDE_CODE_OAUTH_TOKEN", inputs.claudeCodeOauthToken);
-    }
+    core2.exportVariable("CLAUDE_CODE_OAUTH_TOKEN", inputs.claudeCodeOauthToken);
   }
   async cleanupAuth() {
   }
@@ -126605,9 +126597,7 @@ async function run() {
     const provider = getProvider(inputs.provider);
     core7.setOutput("provider" /* Provider */, inputs.provider);
     core7.setOutput("command" /* Command */, provider.command);
-    if (inputs.installCli) {
-      await provider.install(inputs);
-    }
+    await provider.install(inputs);
     await setupProviderAuth(inputs);
     const sessions = await collectAndUploadSessions(inputs, provider);
     core7.setOutput("session-files-path" /* SessionFilesPath */, sessions.path);

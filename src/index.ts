@@ -15,9 +15,7 @@ async function run(): Promise<void> {
 		core.setOutput(OutputName.Provider, inputs.provider)
 		core.setOutput(OutputName.Command, provider.command)
 
-		if (inputs.installCli) {
-			await provider.install(inputs)
-		}
+		await provider.install(inputs)
 		await setupProviderAuth(inputs)
 
 		const sessions = await collectAndUploadSessions(inputs, provider)

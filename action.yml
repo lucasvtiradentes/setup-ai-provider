@@ -10,10 +10,6 @@ inputs:
   provider:
     description: 'AI provider to setup: claude, codex, or gemini'
     required: true
-  install-cli:
-    description: 'Install the selected provider CLI'
-    required: false
-    default: 'true'
   claude-code-oauth-token:
     description: 'Claude Code OAuth token'
     required: false
@@ -23,10 +19,6 @@ inputs:
   gemini-credentials:
     description: 'Content for ~/.gemini/oauth_creds.json'
     required: false
-  export-env:
-    description: 'Export provider auth environment variables for later workflow steps'
-    required: false
-    default: 'true'
   collect-session-files:
     description: 'Copy provider session files into session-files-path'
     required: false

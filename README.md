@@ -47,11 +47,9 @@ Claude uses the official upstream installer script.
 | Input                     | Default                  | Description                                            |
 |---------------------------|--------------------------|--------------------------------------------------------|
 | `provider`                |                          | Provider to setup: `claude`, `codex`, or `gemini`.     |
-| `install-cli`             | `true`                   | Install the selected provider CLI.                     |
 | `claude-code-oauth-token` |                          | Claude Code OAuth token.                               |
 | `codex-auth-json`         |                          | Content for `~/.codex/auth.json`.                      |
 | `gemini-credentials`      |                          | Content for `~/.gemini/oauth_creds.json`.              |
-| `export-env`              | `true`                   | Export provider auth env vars for later steps.         |
 | `collect-session-files`   | `false`                  | Copy provider session files into `session-files-path`. |
 | `session-files-path`      | `provider-session-files` | Destination for collected session files.               |
 | `upload-session-files`    | `false`                  | Upload collected session files as an artifact.         |

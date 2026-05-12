@@ -19835,9 +19835,7 @@ var ClaudeProvider = class {
       return;
     }
     core.setSecret(inputs.claudeCodeOauthToken);
-    if (inputs.exportEnv) {
-      core.exportVariable("CLAUDE_CODE_OAUTH_TOKEN", inputs.claudeCodeOauthToken);
-    }
+    core.exportVariable("CLAUDE_CODE_OAUTH_TOKEN", inputs.claudeCodeOauthToken);
   }
   async cleanupAuth() {
   }

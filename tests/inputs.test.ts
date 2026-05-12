@@ -13,8 +13,6 @@ describe('readInputs', () => {
 
 		expect(readInputs()).toMatchObject({
 			collectSessionFiles: false,
-			exportEnv: true,
-			installCli: true,
 			provider: 'claude',
 			retentionDays: 7,
 			sessionFilesPath: 'provider-session-files',
