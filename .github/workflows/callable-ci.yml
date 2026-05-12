@@ -1,0 +1,83 @@
+name: _callable ci
+
+on:
+  workflow_call:
+    inputs:
+      run_lint:
+        description: Run lint checks
+        type: boolean
+        required: true
+      run_build:
+        description: Run typecheck and build
+        type: boolean
+        required: true
+      run_test:
+        description: Run tests
+        type: boolean
+        required: false
+        default: true
+    outputs:
+      should_release_action:
+        description: Whether package version changed and the action tag is missing
+        value: ${{ jobs.check_version.outputs.should_release_action }}
+
+jobs:
+  check_version:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    outputs:
+      should_release_action: ${{ steps.check.outputs.should_release_action }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: ./.github/actions/setup-and-install
+        with:
+          skip-install: 'true'
+
+      - name: Check package version
+        id: check
+        run: bash .github/scripts/check-version-bump.sh
+
+  check:
+    if: inputs.run_lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-and-install
+
+      - name: Run Biome
+        run: pnpm run check
+
+      - name: Run Knip
+        run: pnpm run knip
+
+  build:
+    if: inputs.run_build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-and-install
+
+      - name: Run typecheck
+        run: pnpm run typecheck
+
+      - name: Build action
+        run: pnpm run build
+
+      - name: Check generated dist
+        run: git diff --exit-code dist
+
+  test:
+    if: inputs.run_test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-and-install
+
+      - name: Run tests
+        run: pnpm run test

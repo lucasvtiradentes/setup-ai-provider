@@ -1,0 +1,69 @@
+name: 'setup-ai-provider'
+description: 'Install, authenticate, and collect session files for AI provider CLIs'
+author: 'lucasvtiradentes'
+
+branding:
+  icon: 'cpu'
+  color: 'blue'
+
+inputs:
+  provider:
+    description: 'AI provider to setup: claude, codex, or gemini'
+    required: true
+  install-cli:
+    description: 'Install the selected provider CLI'
+    required: false
+    default: 'true'
+  claude-code-oauth-token:
+    description: 'Claude Code OAuth token'
+    required: false
+  codex-auth-json:
+    description: 'Content for ~/.codex/auth.json'
+    required: false
+  gemini-credentials:
+    description: 'Content for ~/.gemini/oauth_creds.json'
+    required: false
+  export-env:
+    description: 'Export provider auth environment variables for later workflow steps'
+    required: false
+    default: 'true'
+  collect-session-files:
+    description: 'Copy provider session files into session-files-path'
+    required: false
+    default: 'false'
+  session-files-path:
+    description: 'Destination path for collected provider session files'
+    required: false
+    default: 'provider-session-files'
+  upload-session-files:
+    description: 'Upload collected provider session files as a workflow artifact'
+    required: false
+    default: 'false'
+  artifact-name:
+    description: 'Artifact name for uploaded session files'
+    required: false
+    default: ''
+  retention-days:
+    description: 'Artifact retention days'
+    required: false
+    default: '7'
+
+outputs:
+  provider:
+    description: 'The selected provider'
+  command:
+    description: 'The provider CLI command name'
+  session-files-path:
+    description: 'Directory containing collected provider session files'
+  session-files-found:
+    description: 'Whether provider session files were found'
+  artifact-id:
+    description: 'Uploaded artifact ID when upload-session-files is true'
+  artifact-url:
+    description: 'Uploaded artifact URL when upload-session-files is true'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
+  post: 'dist/cleanup.js'
+  post-if: 'always()'

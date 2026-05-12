@@ -1,0 +1,34 @@
+name: Setup and install
+description: Setup Node.js, pnpm, cache, and dependencies
+
+inputs:
+  skip-install:
+    description: Skip dependency installation
+    required: false
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+
+    - name: Setup Node.js with pnpm cache
+      if: ${{ inputs.skip-install != 'true' }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'pnpm'
+        cache-dependency-path: pnpm-lock.yaml
+
+    - name: Setup Node.js without cache
+      if: ${{ inputs.skip-install == 'true' }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        package-manager-cache: false
+
+    - name: Install dependencies
+      if: ${{ inputs.skip-install != 'true' }}
+      shell: bash
+      run: pnpm install --frozen-lockfile
