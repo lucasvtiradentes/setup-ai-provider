@@ -13,16 +13,14 @@ tag_exists() {
 	git ls-remote --tags origin | grep -q "refs/tags/$tag$"
 }
 
-create_version_release() {
+create_version_tag() {
 	if tag_exists "$version_tag"; then
 		printf 'Tag %s already exists\n' "$version_tag"
 		return
 	fi
 
-	gh release create "$version_tag" \
-		--title "$version_tag" \
-		--generate-notes \
-		--target "$GITHUB_SHA"
+	git tag "$version_tag" "$GITHUB_SHA"
+	git push origin "$version_tag"
 }
 
 update_major_tag() {
@@ -33,7 +31,7 @@ update_major_tag() {
 }
 
 main() {
-	create_version_release
+	create_version_tag
 	update_major_tag
 }
 

@@ -55,7 +55,5 @@ jobs:
 
       - uses: ./.github/actions/setup-and-install
 
-      - name: Create GitHub Action release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Tag GitHub Action release
         run: pnpm run release:github
