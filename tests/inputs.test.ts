@@ -13,6 +13,7 @@ describe('readInputs', () => {
 		process.env.INPUT_PROVIDER = 'claude'
 
 		expect(readInputs()).toMatchObject({
+			additionalConsumers: [],
 			provider: 'claude',
 			retentionDays: 7,
 			sessionFilesPath: 'provider-session-files',
@@ -24,8 +25,10 @@ describe('readInputs', () => {
 		process.env.INPUT_PROVIDER = 'gemini'
 		process.env['INPUT_CODEX-AUTH-JSON'] = '{"codex":true}'
 		process.env['INPUT_GEMINI-AUTH-JSON'] = '{"gemini":true}'
+		process.env['INPUT_ADDITIONAL-CONSUMERS'] = 'pi'
 
 		expect(readInputs()).toMatchObject({
+			additionalConsumers: ['pi'],
 			codexAuthJson: '{"codex":true}',
 			geminiAuthJson: '{"gemini":true}',
 		})

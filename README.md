@@ -22,6 +22,7 @@ I wanted AI coding agents in CI across many repositories without duplicating set
 
 - One CI setup flow for [Claude Code](https://claude.com/product/claude-code), [Codex](https://openai.com/codex/), and [Gemini](https://geminicli.com/).
 - Provider switching through one workflow input.
+- Optional additional consumers, like configuring Pi from Codex auth.
 - Optional post-step session upload for debugging or formatting with tools like Pretty Session.
 
 ## 🚀 Setup
@@ -63,6 +64,7 @@ gh secret set CODEX_AUTH_JSON < ~/.codex/auth.json
   with:
     provider: codex
     codex-auth-json: ${{ secrets.CODEX_AUTH_JSON }}
+    additional-consumers: pi # optional: also configure ~/.pi/agent/auth.json
     upload-session-files: 'true' # optional
 - run: codex exec "review this pull request" --json --dangerously-bypass-approvals-and-sandbox
 ```
@@ -116,9 +118,13 @@ The action also marks the CI workspace as trusted for Gemini CLI runs.
   </thead>
   <tbody>
     <tr>
-      <td rowspan="4">Auth</td>
+      <td rowspan="5">Auth</td>
       <td><code>provider</code></td>
       <td>Provider to setup: <code>claude</code>, <code>codex</code>, or <code>gemini</code>.</td>
+    </tr>
+    <tr>
+      <td><code>additional-consumers</code></td>
+      <td>Comma-separated extra tools to configure from the selected provider auth. Currently supports <code>pi</code> with <code>provider: codex</code>.</td>
     </tr>
     <tr>
       <td><code>claude-code-oauth-token</code></td>

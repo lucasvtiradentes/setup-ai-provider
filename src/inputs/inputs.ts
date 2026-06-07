@@ -1,11 +1,12 @@
 import * as core from '@actions/core'
 import { z } from 'zod'
-import { ProviderName } from '../providers/shared/types'
+import { ConsumerName, ProviderName } from '../providers/shared/types'
 import { CONFIGS, booleanSchema } from './configs'
 
 enum InputName {
 	// Step 1: select provider.
 	Provider = 'provider',
+	AdditionalConsumers = 'additional-consumers',
 
 	// Step 2: setup provider auth.
 	ClaudeCodeOauthToken = 'claude-code-oauth-token',
@@ -19,9 +20,20 @@ enum InputName {
 	RetentionDays = 'retention-days',
 }
 
+const consumerListSchema = z
+	.string()
+	.transform((value) =>
+		value
+			.split(',')
+			.map((item) => item.trim())
+			.filter(Boolean),
+	)
+	.pipe(z.array(z.enum(ConsumerName)))
+
 export const inputsSchema = z.object({
 	// Step 1: select provider.
 	provider: z.enum(ProviderName),
+	additionalConsumers: consumerListSchema,
 
 	// Step 2: setup provider auth.
 	claudeCodeOauthToken: z.string(),
@@ -41,6 +53,7 @@ export function readInputs(): ActionInputs {
 	return inputsSchema.parse({
 		// Step 1: select provider.
 		provider: core.getInput(InputName.Provider),
+		additionalConsumers: core.getInput(InputName.AdditionalConsumers) || CONFIGS.defaults.additionalConsumers,
 
 		// Step 2: setup provider auth.
 		claudeCodeOauthToken: core.getInput(InputName.ClaudeCodeOauthToken),

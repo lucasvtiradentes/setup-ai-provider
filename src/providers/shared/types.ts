@@ -6,6 +6,10 @@ export enum ProviderName {
 	Gemini = 'gemini',
 }
 
+export enum ConsumerName {
+	Pi = 'pi',
+}
+
 export type AiProvider = {
 	readonly command: string
 	readonly name: ProviderName

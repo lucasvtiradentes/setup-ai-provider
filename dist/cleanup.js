@@ -19785,14 +19785,14 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
       });
     }
     exports2.group = group;
-    function saveState4(name, value) {
+    function saveState5(name, value) {
       const filePath = process.env["GITHUB_STATE"] || "";
       if (filePath) {
         return (0, file_command_1.issueFileCommand)("STATE", (0, file_command_1.prepareKeyValueMessage)(name, value));
       }
       (0, command_1.issueCommand)("save-state", { name }, (0, utils_1.toCommandValue)(value));
     }
-    exports2.saveState = saveState4;
+    exports2.saveState = saveState5;
     function getState3(name) {
       return process.env[`STATE_${name}`] || "";
     }
@@ -43014,8 +43014,8 @@ var require_graceful_fs = __commonJS({
       fs8.createReadStream = createReadStream2;
       fs8.createWriteStream = createWriteStream2;
       var fs$readFile = fs8.readFile;
-      fs8.readFile = readFile2;
-      function readFile2(path4, options, cb) {
+      fs8.readFile = readFile3;
+      function readFile3(path4, options, cb) {
         if (typeof options === "function")
           cb = options, options = null;
         return go$readFile(path4, options, cb);
@@ -43599,7 +43599,7 @@ var require_BufferList = __commonJS({
         this.head = this.tail = null;
         this.length = 0;
       };
-      BufferList.prototype.join = function join5(s) {
+      BufferList.prototype.join = function join6(s) {
         if (this.length === 0) return "";
         var p = this.head;
         var ret = "" + p.data;
@@ -69205,7 +69205,7 @@ var require_light = __commonJS({
 });
 
 // src/cleanup.ts
-var core8 = __toESM(require_core());
+var core9 = __toESM(require_core());
 
 // node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/external.js
 var external_exports = {};
@@ -83727,6 +83727,7 @@ var core2 = __toESM(require_core());
 // src/inputs/configs.ts
 var CONFIGS = {
   defaults: {
+    additionalConsumers: "",
     artifactName: "",
     retentionDays: "7",
     sessionFilesPath: "provider-session-files",
@@ -83747,11 +83748,19 @@ var ProviderName = /* @__PURE__ */ ((ProviderName2) => {
   ProviderName2["Gemini"] = "gemini";
   return ProviderName2;
 })(ProviderName || {});
+var ConsumerName = /* @__PURE__ */ ((ConsumerName2) => {
+  ConsumerName2["Pi"] = "pi";
+  return ConsumerName2;
+})(ConsumerName || {});
 
 // src/inputs/inputs.ts
+var consumerListSchema = external_exports.string().transform(
+  (value) => value.split(",").map((item) => item.trim()).filter(Boolean)
+).pipe(external_exports.array(external_exports.enum(ConsumerName)));
 var inputsSchema = external_exports.object({
   // Step 1: select provider.
   provider: external_exports.enum(ProviderName),
+  additionalConsumers: consumerListSchema,
   // Step 2: setup provider auth.
   claudeCodeOauthToken: external_exports.string(),
   codexAuthJson: external_exports.string(),
@@ -83785,46 +83794,25 @@ function readSessionInputs() {
   });
 }
 
-// src/providers/claude.ts
-var core3 = __toESM(require_core());
-var exec = __toESM(require_exec());
-var ClaudeProvider = class {
-  command = "claude";
-  name = "claude" /* Claude */;
-  sessionDir = ".claude/projects";
-  async install() {
-    await exec.exec("bash", ["-c", "curl -fsSL https://claude.ai/install.sh | bash"]);
-  }
-  async setupAuth(inputs) {
-    if (!inputs.claudeCodeOauthToken) {
-      return;
-    }
-    core3.setSecret(inputs.claudeCodeOauthToken);
-    core3.exportVariable("CLAUDE_CODE_OAUTH_TOKEN", inputs.claudeCodeOauthToken);
-  }
-  async cleanupAuth() {
-  }
-};
-
-// src/providers/codex.ts
+// src/consumers/pi.ts
 var import_promises2 = require("fs/promises");
 var import_node_os = require("os");
 var import_node_path = require("path");
-var core5 = __toESM(require_core());
+var core4 = __toESM(require_core());
 
 // src/providers/shared/utils.ts
 var import_promises = require("fs/promises");
-var core4 = __toESM(require_core());
-var exec3 = __toESM(require_exec());
+var core3 = __toESM(require_core());
+var exec = __toESM(require_exec());
 async function installNpmPackage(packageName) {
-  await exec3.exec("npm", ["install", "--global", packageName]);
+  await exec.exec("npm", ["install", "--global", packageName]);
 }
 async function writeSecretFile(path4, content) {
   await (0, import_promises.writeFile)(path4, content, "utf8");
   await (0, import_promises.chmod)(path4, 384);
 }
 async function removeStatePath(name) {
-  const path4 = core4.getState(name);
+  const path4 = core3.getState(name);
   if (!path4) {
     return;
   }
@@ -83845,7 +83833,7 @@ function readObject(value) {
   return value;
 }
 function maskJsonSecrets(content) {
-  core4.setSecret(content);
+  core3.setSecret(content);
   try {
     maskJsonValue(JSON.parse(content));
   } catch {
@@ -83867,7 +83855,7 @@ function maskJsonValue(value) {
   }
   for (const [key, item] of Object.entries(value)) {
     if (typeof item === "string" && isSecretKey(key)) {
-      core4.setSecret(item);
+      core3.setSecret(item);
     }
     maskJsonValue(item);
   }
@@ -83877,7 +83865,38 @@ function isSecretKey(key) {
   return normalized === "token" || normalized.endsWith("_token") || normalized.endsWith("token") || normalized === "api_key" || normalized === "client_secret" || normalized === "password" || normalized === "secret";
 }
 
+// src/consumers/pi.ts
+var PI_AUTH_STATE_KEY = "pi-auth-path";
+async function cleanupPiConsumer() {
+  await removeStatePath(PI_AUTH_STATE_KEY);
+}
+
+// src/providers/claude.ts
+var core5 = __toESM(require_core());
+var exec3 = __toESM(require_exec());
+var ClaudeProvider = class {
+  command = "claude";
+  name = "claude" /* Claude */;
+  sessionDir = ".claude/projects";
+  async install() {
+    await exec3.exec("bash", ["-c", "curl -fsSL https://claude.ai/install.sh | bash"]);
+  }
+  async setupAuth(inputs) {
+    if (!inputs.claudeCodeOauthToken) {
+      return;
+    }
+    core5.setSecret(inputs.claudeCodeOauthToken);
+    core5.exportVariable("CLAUDE_CODE_OAUTH_TOKEN", inputs.claudeCodeOauthToken);
+  }
+  async cleanupAuth() {
+  }
+};
+
 // src/providers/codex.ts
+var import_promises3 = require("fs/promises");
+var import_node_os2 = require("os");
+var import_node_path2 = require("path");
+var core6 = __toESM(require_core());
 var CodexProvider = class {
   command = "codex";
   name = "codex" /* Codex */;
@@ -83890,11 +83909,11 @@ var CodexProvider = class {
       return;
     }
     maskJsonSecrets(inputs.codexAuthJson);
-    const codexDir = (0, import_node_path.join)((0, import_node_os.homedir)(), ".codex");
-    const authPath = (0, import_node_path.join)(codexDir, "auth.json");
-    await (0, import_promises2.mkdir)(codexDir, { recursive: true });
+    const codexDir = (0, import_node_path2.join)((0, import_node_os2.homedir)(), ".codex");
+    const authPath = (0, import_node_path2.join)(codexDir, "auth.json");
+    await (0, import_promises3.mkdir)(codexDir, { recursive: true });
     await writeSecretFile(authPath, inputs.codexAuthJson);
-    core5.saveState("codex-auth-path", authPath);
+    core6.saveState("codex-auth-path", authPath);
   }
   async cleanupAuth() {
     await removeStatePath("codex-auth-path");
@@ -83902,10 +83921,10 @@ var CodexProvider = class {
 };
 
 // src/providers/gemini.ts
-var import_promises3 = require("fs/promises");
-var import_node_os2 = require("os");
-var import_node_path2 = require("path");
-var core6 = __toESM(require_core());
+var import_promises4 = require("fs/promises");
+var import_node_os3 = require("os");
+var import_node_path3 = require("path");
+var core7 = __toESM(require_core());
 var GeminiProvider = class {
   command = "gemini";
   name = "gemini" /* Gemini */;
@@ -83918,15 +83937,15 @@ var GeminiProvider = class {
       return;
     }
     maskJsonSecrets(inputs.geminiAuthJson);
-    const geminiDir = (0, import_node_path2.join)((0, import_node_os2.homedir)(), ".gemini");
-    const credentialsPath = (0, import_node_path2.join)(geminiDir, "oauth_creds.json");
-    const settingsPath = (0, import_node_path2.join)(geminiDir, "settings.json");
-    await (0, import_promises3.mkdir)(geminiDir, { recursive: true });
+    const geminiDir = (0, import_node_path3.join)((0, import_node_os3.homedir)(), ".gemini");
+    const credentialsPath = (0, import_node_path3.join)(geminiDir, "oauth_creds.json");
+    const settingsPath = (0, import_node_path3.join)(geminiDir, "settings.json");
+    await (0, import_promises4.mkdir)(geminiDir, { recursive: true });
     await writeSecretFile(credentialsPath, inputs.geminiAuthJson);
-    await (0, import_promises3.writeFile)(settingsPath, `${JSON.stringify(await this.mergeSettings(settingsPath), null, 2)}
+    await (0, import_promises4.writeFile)(settingsPath, `${JSON.stringify(await this.mergeSettings(settingsPath), null, 2)}
 `, "utf8");
-    core6.exportVariable("GEMINI_CLI_TRUST_WORKSPACE", "true");
-    core6.saveState("gemini-auth-json-path", credentialsPath);
+    core7.exportVariable("GEMINI_CLI_TRUST_WORKSPACE", "true");
+    core7.saveState("gemini-auth-json-path", credentialsPath);
   }
   async cleanupAuth() {
     await removeStatePath("gemini-auth-json-path");
@@ -83963,15 +83982,19 @@ function getProviders() {
 
 // src/providers/shared/auth.ts
 async function cleanupProviderAuth() {
+  await cleanupAdditionalConsumers();
   for (const provider of getProviders()) {
     await provider.cleanupAuth();
   }
 }
+async function cleanupAdditionalConsumers() {
+  await cleanupPiConsumer();
+}
 
 // src/sessions/collect.ts
-var import_promises7 = require("fs/promises");
-var import_node_os6 = require("os");
-var import_node_path3 = require("path");
+var import_promises8 = require("fs/promises");
+var import_node_os7 = require("os");
+var import_node_path4 = require("path");
 
 // node_modules/.pnpm/@actions+core@3.0.1/node_modules/@actions/core/lib/command.js
 var os = __toESM(require("os"), 1);
@@ -85095,7 +85118,7 @@ var import_os2 = __toESM(require("os"), 1);
 
 // node_modules/.pnpm/@actions+io@3.0.2/node_modules/@actions/io/lib/io-util.js
 var fs = __toESM(require("fs"), 1);
-var { chmod: chmod2, copyFile, lstat, mkdir: mkdir3, open, readdir, rename, rm: rm2, rmdir, stat, symlink, unlink } = fs.promises;
+var { chmod: chmod2, copyFile, lstat, mkdir: mkdir4, open, readdir, rename, rm: rm2, rmdir, stat, symlink, unlink } = fs.promises;
 var IS_WINDOWS = process.platform === "win32";
 var READONLY = fs.constants.O_RDONLY;
 
@@ -89742,11 +89765,11 @@ var AbortError = class extends Error {
 };
 
 // node_modules/.pnpm/@typespec+ts-http-runtime@0.3.5/node_modules/@typespec/ts-http-runtime/dist/esm/logger/log.js
-var import_node_os3 = require("os");
+var import_node_os4 = require("os");
 var import_node_util = __toESM(require("util"), 1);
 var import_node_process = __toESM(require("process"), 1);
 function log(message, ...args) {
-  import_node_process.default.stderr.write(`${import_node_util.default.format(message, ...args)}${import_node_os3.EOL}`);
+  import_node_process.default.stderr.write(`${import_node_util.default.format(message, ...args)}${import_node_os4.EOL}`);
 }
 
 // node_modules/.pnpm/@typespec+ts-http-runtime@0.3.5/node_modules/@typespec/ts-http-runtime/dist/esm/logger/debug.js
@@ -90908,7 +90931,7 @@ async function handleRedirect(next, response, maxRetries, allowCrossOriginRedire
 }
 
 // node_modules/.pnpm/@typespec+ts-http-runtime@0.3.5/node_modules/@typespec/ts-http-runtime/dist/esm/util/userAgentPlatform.js
-var import_node_os4 = __toESM(require("os"), 1);
+var import_node_os5 = __toESM(require("os"), 1);
 var import_node_process2 = __toESM(require("process"), 1);
 function getHeaderName() {
   return "User-Agent";
@@ -91613,14 +91636,14 @@ function redirectPolicy2(options = {}) {
 }
 
 // node_modules/.pnpm/@azure+core-rest-pipeline@1.23.0/node_modules/@azure/core-rest-pipeline/dist/esm/util/userAgentPlatform.js
-var import_node_os5 = __toESM(require("os"), 1);
+var import_node_os6 = __toESM(require("os"), 1);
 var import_node_process3 = __toESM(require("process"), 1);
 function getHeaderName2() {
   return "User-Agent";
 }
 async function setPlatformSpecificData2(map3) {
   if (import_node_process3.default && import_node_process3.default.versions) {
-    const osInfo = `${import_node_os5.default.type()} ${import_node_os5.default.release()}; ${import_node_os5.default.arch()}`;
+    const osInfo = `${import_node_os6.default.type()} ${import_node_os6.default.release()}; ${import_node_os6.default.arch()}`;
     const versions = import_node_process3.default.versions;
     if (versions.bun) {
       map3.set("Bun", `${versions.bun} (${osInfo})`);
@@ -121662,13 +121685,13 @@ function uploadToBlobStorage(authenticatedUploadURL, uploadStream, contentType2)
 }
 
 // node_modules/.pnpm/@actions+artifact@6.2.1/node_modules/@actions/artifact/lib/internal/upload/zip.js
-var import_promises5 = require("fs/promises");
+var import_promises6 = require("fs/promises");
 var import_archiver = __toESM(require_archiver(), 1);
 
 // node_modules/.pnpm/@actions+artifact@6.2.1/node_modules/@actions/artifact/lib/internal/upload/stream.js
 var stream2 = __toESM(require("stream"), 1);
 var fs4 = __toESM(require("fs"), 1);
-var import_promises4 = require("fs/promises");
+var import_promises5 = require("fs/promises");
 var __awaiter6 = function(thisArg, _arguments, P, generator) {
   function adopt(value) {
     return value instanceof P ? value : new P(function(resolve3) {
@@ -121715,7 +121738,7 @@ function createRawFileUploadStream(filePath) {
     let sourcePath = filePath;
     const stats = yield fs4.promises.lstat(filePath);
     if (stats.isSymbolicLink()) {
-      sourcePath = yield (0, import_promises4.realpath)(filePath);
+      sourcePath = yield (0, import_promises5.realpath)(filePath);
     }
     const fileStream = fs4.createReadStream(sourcePath, {
       highWaterMark: bufferSize
@@ -121774,7 +121797,7 @@ function createZipUploadStream(uploadSpecification_1) {
       if (file2.sourcePath !== null) {
         let sourcePath = file2.sourcePath;
         if (file2.stats.isSymbolicLink()) {
-          sourcePath = yield (0, import_promises5.realpath)(file2.sourcePath);
+          sourcePath = yield (0, import_promises6.realpath)(file2.sourcePath);
         }
         zip.file(sourcePath, {
           name: file2.destinationPath
@@ -121985,7 +122008,7 @@ function uploadArtifact(name, files, rootDirectory, options) {
 }
 
 // node_modules/.pnpm/@actions+artifact@6.2.1/node_modules/@actions/artifact/lib/internal/download/download-artifact.js
-var import_promises6 = __toESM(require("fs/promises"), 1);
+var import_promises7 = __toESM(require("fs/promises"), 1);
 var fsSync = __toESM(require("fs"), 1);
 var crypto3 = __toESM(require("crypto"), 1);
 var stream3 = __toESM(require("stream"), 1);
@@ -125773,7 +125796,7 @@ var scrubQueryParameters = (url3) => {
 function exists2(path4) {
   return __awaiter10(this, void 0, void 0, function* () {
     try {
-      yield import_promises6.default.access(path4);
+      yield import_promises7.default.access(path4);
       return true;
     } catch (error52) {
       if (error52.code === "ENOENT") {
@@ -125948,7 +125971,7 @@ function resolveOrCreateDirectory() {
   return __awaiter10(this, arguments, void 0, function* (downloadPath = getGitHubWorkspaceDir()) {
     if (!(yield exists2(downloadPath))) {
       debug(`Artifact destination folder does not exist, creating: ${downloadPath}`);
-      yield import_promises6.default.mkdir(downloadPath, { recursive: true });
+      yield import_promises7.default.mkdir(downloadPath, { recursive: true });
     } else {
       debug(`Artifact destination folder already exists: ${downloadPath}`);
     }
@@ -126548,9 +126571,9 @@ If the error persists, please check whether Actions and API requests are operati
 var client = new DefaultArtifactClient();
 
 // src/sessions/collect.ts
-var core7 = __toESM(require_core());
+var core8 = __toESM(require_core());
 async function collectAndUploadSessions(inputs, provider) {
-  const destination = (0, import_node_path3.resolve)(inputs.sessionFilesPath);
+  const destination = (0, import_node_path4.resolve)(inputs.sessionFilesPath);
   let found = false;
   if (inputs.uploadSessionFiles) {
     found = await collectSessions(provider, destination);
@@ -126566,24 +126589,24 @@ async function collectAndUploadSessions(inputs, provider) {
       artifactId = String(upload.id ?? "");
       artifactUrl = buildArtifactUrl(artifactId);
     } else {
-      core7.warning(`No ${inputs.provider} session files found to upload`);
+      core8.warning(`No ${inputs.provider} session files found to upload`);
     }
   }
   return { artifactId, artifactUrl, found, path: destination };
 }
 async function collectSessions(provider, destination) {
-  const source = (0, import_node_path3.join)((0, import_node_os6.homedir)(), provider.sessionDir);
-  await (0, import_promises7.rm)(destination, { force: true, recursive: true });
-  await (0, import_promises7.mkdir)(destination, { recursive: true });
+  const source = (0, import_node_path4.join)((0, import_node_os7.homedir)(), provider.sessionDir);
+  await (0, import_promises8.rm)(destination, { force: true, recursive: true });
+  await (0, import_promises8.mkdir)(destination, { recursive: true });
   if (!await exists3(source)) {
     return false;
   }
-  await (0, import_promises7.cp)(source, destination, { recursive: true });
+  await (0, import_promises8.cp)(source, destination, { recursive: true });
   return hasFiles(destination);
 }
 async function exists3(path4) {
   try {
-    await (0, import_promises7.stat)(path4);
+    await (0, import_promises8.stat)(path4);
     return true;
   } catch {
     return false;
@@ -126594,8 +126617,8 @@ async function hasFiles(path4) {
   return files.length > 0;
 }
 async function listFiles(path4) {
-  const entries = await (0, import_promises7.readdir)(path4, { recursive: true, withFileTypes: true });
-  return entries.filter((entry) => entry.isFile()).map((entry) => (0, import_node_path3.join)(entry.parentPath, entry.name));
+  const entries = await (0, import_promises8.readdir)(path4, { recursive: true, withFileTypes: true });
+  return entries.filter((entry) => entry.isFile()).map((entry) => (0, import_node_path4.join)(entry.parentPath, entry.name));
 }
 function getArtifactName(inputs) {
   return inputs.artifactName || `${inputs.provider}-session-files`;
@@ -126629,13 +126652,13 @@ async function runCleanup() {
 }
 function handleSessionError(error52) {
   if (error52 instanceof ZodError) {
-    core8.setFailed(error52.issues.map((issue3) => `${issue3.path.join(".")}: ${issue3.message}`).join("\n"));
+    core9.setFailed(error52.issues.map((issue3) => `${issue3.path.join(".")}: ${issue3.message}`).join("\n"));
     return;
   }
-  core8.setFailed(error52 instanceof Error ? error52.message : String(error52));
+  core9.setFailed(error52 instanceof Error ? error52.message : String(error52));
 }
 function handleCleanupError(error52) {
-  core8.warning(error52 instanceof Error ? error52.message : String(error52));
+  core9.warning(error52 instanceof Error ? error52.message : String(error52));
 }
 /*! Bundled license information:
 

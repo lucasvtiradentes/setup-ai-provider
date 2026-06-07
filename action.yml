@@ -11,6 +11,10 @@ inputs:
   provider:
     description: 'AI provider to setup: claude, codex, or gemini'
     required: true
+  additional-consumers:
+    description: 'Comma-separated extra tools to configure from the selected provider auth, e.g. pi'
+    required: false
+    default: ''
 
   # Step 2: setup provider auth.
   claude-code-oauth-token:
