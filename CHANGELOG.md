@@ -1,5 +1,11 @@
 # setup-ai-provider
 
+## 0.2.0
+
+### Minor Changes
+
+- 9437453: Add `additional-consumers` input and support configuring Pi auth from Codex credentials.
+
 ## 0.1.1
 
 ### Patch Changes

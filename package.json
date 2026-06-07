@@ -1,6 +1,6 @@
 {
 	"name": "setup-ai-provider",
-	"version": "0.1.1",
+	"version": "0.2.0",
 	"description": "GitHub Action for installing, authenticating, and collecting session files for AI provider CLIs",
 	"packageManager": "pnpm@10.22.0",
 	"main": "dist/index.js",

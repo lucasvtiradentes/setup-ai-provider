@@ -37,7 +37,7 @@ gh secret set CLAUDE_CODE_OAUTH_TOKEN -b '<token>'
 ```
 
 ```yaml
-- uses: lucasvtiradentes/setup-ai-provider@v0.1.1
+- uses: lucasvtiradentes/setup-ai-provider@v0.2.0
   with:
     provider: claude
     claude-code-oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
@@ -60,7 +60,7 @@ gh secret set CODEX_AUTH_JSON < ~/.codex/auth.json
 ```
 
 ```yaml
-- uses: lucasvtiradentes/setup-ai-provider@v0.1.1
+- uses: lucasvtiradentes/setup-ai-provider@v0.2.0
   with:
     provider: codex
     codex-auth-json: ${{ secrets.CODEX_AUTH_JSON }}
@@ -88,7 +88,7 @@ gh secret set GEMINI_CREDENTIALS < ~/.gemini/oauth_creds.json
 ```
 
 ```yaml
-- uses: lucasvtiradentes/setup-ai-provider@v0.1.1
+- uses: lucasvtiradentes/setup-ai-provider@v0.2.0
   with:
     provider: gemini
     gemini-auth-json: ${{ secrets.GEMINI_CREDENTIALS }}
